@@ -176,6 +176,7 @@ func Generics(filename, outputFilename, pkgName, tag string, in io.ReadSeeker, t
 	localUnwantedLinePrefixes = append(localUnwantedLinePrefixes, unwantedLinePrefixes...)
 
 	if tag != "" {
+		localUnwantedLinePrefixes = append(localUnwantedLinePrefixes, []byte(fmt.Sprintf("//go:build %s", tag)))
 		localUnwantedLinePrefixes = append(localUnwantedLinePrefixes, []byte(fmt.Sprintf("// +build %s", tag)))
 	}
 
