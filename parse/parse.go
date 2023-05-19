@@ -197,16 +197,21 @@ func Generics(filename, outputFilename, pkgName, tag string, in io.ReadSeeker, t
 	// clean up the code line by line
 	packageFound := false
 	insideImportBlock := false
+	firstImportBlock := true
 	var cleanOutputLines []string
 	scanner := bufio.NewScanner(bytes.NewReader(totalOutput))
 	for scanner.Scan() {
 
 		// end of imports block?
 		if insideImportBlock {
+			fib := firstImportBlock
 			if bytes.HasSuffix(scanner.Bytes(), closeBrace) {
 				insideImportBlock = false
+				firstImportBlock = false
 			}
-			continue
+			if !fib {
+				continue
+			}
 		}
 
 		if bytes.HasPrefix(scanner.Bytes(), packageKeyword) {
@@ -218,8 +223,12 @@ func Generics(filename, outputFilename, pkgName, tag string, in io.ReadSeeker, t
 		} else if bytes.HasPrefix(scanner.Bytes(), importKeyword) {
 			if bytes.HasSuffix(scanner.Bytes(), openBrace) {
 				insideImportBlock = true
+				if !firstImportBlock {
+					continue
+				}
+			} else {
+				continue
 			}
-			continue
 		}
 
 		// check all localUnwantedLinePrefixes - and skip them
